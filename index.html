@@ -1,205 +1,132 @@
+---
+layout: null
+---
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Dance Move Shuffler</title>
-    <style>
-        body {
-            font-family: system-ui, sans-serif;
-            background: #1a1a2e;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 1rem;
-            box-sizing: border-box;
-        }
-        .container {
-            width: 100%;
-            max-width: 600px;
-            text-align: center;
-        }
-        .pair {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 1rem;
-            margin: 1.5rem 0;
-        }
-        .card {
-            background: #16213e;
-            border: 2px solid #0f3460;
-            border-radius: 1.5rem;
-            padding: 2rem 1.5rem;
-            min-width: 120px;
-            flex: 1 1 120px;
-            font-size: 1.8rem;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            transition: 0.2s;
-        }
-        .done-btn {
-            background: #e94560;
-            border: none;
-            color: white;
-            font-size: 1.8rem;
-            font-weight: bold;
-            padding: 1rem 2.5rem;
-            border-radius: 3rem;
-            margin-top: 1.5rem;
-            box-shadow: 0 10px 20px rgba(233,69,96,0.4);
-            cursor: pointer;
-            width: 100%;
-            max-width: 320px;
-            transition: 0.15s;
-        }
-        .done-btn:active {
-            background: #c23152;
-            transform: scale(0.96);
-        }
-        .restart-btn {
-            background: transparent;
-            border: 2px solid #ffffff88;
-            color: #ffffffcc;
-            font-size: 1.2rem;
-            padding: 0.7rem 2rem;
-            border-radius: 2rem;
-            margin-top: 1rem;
-            cursor: pointer;
-        }
-        .info {
-            opacity: 0.7;
-            margin-bottom: 0.5rem;
-            font-size: 1rem;
-            min-height: 1.5em;
-        }
-    </style>
+    <title>{{ site.title }} | Randomizer</title>
+    <link rel="stylesheet" href="{{ '/assets/site.css' | relative_url }}">
 </head>
 <body>
-    <div class="container">
-        <h1>🕺 Dance Moves</h1>
-        <div class="pair" id="pairContainer">
-            <div class="card" id="card1">—</div>
-            <div class="card" id="card2">—</div>
-        </div>
-        <button class="done-btn" id="doneBtn">✅ Done / Next pair</button>
-        <button class="restart-btn" id="restartBtn">🔀 Reshuffle & start over</button>
-        <p class="info" id="remainingInfo"></p>
-    </div>
+    <main class="page-shell page-shell--narrow">
+        <nav class="site-nav" aria-label="Site">
+            <a href="{{ '/' | relative_url }}" aria-current="page">Randomizer</a>
+            <a href="{{ '/challenge.html' | relative_url }}">Challenge</a>
+            <a href="{{ '/figures.html' | relative_url }}">Figure reference</a>
+        </nav>
+
+        <header class="hero">
+            <p class="eyebrow">Salsa Instincts</p>
+            <h1>Random Pair Practice</h1>
+            <p class="hero-copy">Draw two figures at a time from the shared catalog, then tap through the deck until the cycle resets.</p>
+        </header>
+
+        <section class="panel">
+            <div class="pair">
+                <div class="card" id="card1">—</div>
+                <div class="card" id="card2">—</div>
+            </div>
+
+            <div class="button-row">
+                <button class="done-btn" id="doneBtn">Done / Next pair</button>
+                <button class="restart-btn" id="restartBtn">Reshuffle &amp; start over</button>
+            </div>
+
+            <p class="info" id="remainingInfo"></p>
+        </section>
+    </main>
 
     <script>
-        // 👇 YOUR 15 DANCE MOVES (from Task 2)
-        const allMoves = [
-            "Suzy q",
-            "Zeta",
-            "Rhombus",
-            "Kick ball change",
-            "Cross forward",
-            "Crossovers",
-            "Mambo",
-            "Cross step Suzy q",
-            "Braid",
-            "Fence",
-            "Grapevine",
-            "Right turn",
-            "Left turn",
-            "Half right turn",
-            "Half left turn"
-        ];
+        const figureGroups = {{ site.data.figures | jsonify }};
+        const allMoves = figureGroups.flatMap((group) => group.figures.map((figure) => figure.name));
 
-        let deck = [];               // remaining (not yet shown) moves
-        let currentPair = [];        // the 1 or 2 moves currently displayed
+        if (allMoves.length === 0) {
+            throw new Error("No figures found in _data/figures.yml");
+        }
 
-        // DOM elements
-        const card1El = document.getElementById('card1');
-        const card2El = document.getElementById('card2');
-        const doneBtn = document.getElementById('doneBtn');
-        const restartBtn = document.getElementById('restartBtn');
-        const remainingInfo = document.getElementById('remainingInfo');
+        let deck = [];
+        let currentPair = [];
 
-        // Shuffle helper
-        function shuffleArray(arr) {
-            for (let i = arr.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [arr[i], arr[j]] = [arr[j], arr[i]];
+        const card1El = document.getElementById("card1");
+        const card2El = document.getElementById("card2");
+        const doneBtn = document.getElementById("doneBtn");
+        const restartBtn = document.getElementById("restartBtn");
+        const remainingInfo = document.getElementById("remainingInfo");
+
+        function shuffleArray(items) {
+            const shuffled = [...items];
+
+            for (let index = shuffled.length - 1; index > 0; index -= 1) {
+                const swapIndex = Math.floor(Math.random() * (index + 1));
+                [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
             }
-            return arr;
+
+            return shuffled;
         }
 
-        // Pick a random move from the full list (for the odd‑pair case)
-        function getRandomMove() {
-            const idx = Math.floor(Math.random() * allMoves.length);
-            return allMoves[idx];
+        function getRandomPartner(excludedMove) {
+            const candidates = allMoves.filter((move) => move !== excludedMove);
+            const partnerPool = candidates.length > 0 ? candidates : allMoves;
+            const randomIndex = Math.floor(Math.random() * partnerPool.length);
+            return partnerPool[randomIndex];
         }
 
-        // Reset the whole session: reshuffle, clear current pair, show first pair
         function fullReset() {
-            deck = shuffleArray([...allMoves]);
+            deck = shuffleArray(allMoves);
             currentPair = [];
             showNextPair();
         }
 
-        // Draw the next pair from the deck (2 moves if possible, else 1 + random)
         function showNextPair() {
             if (deck.length >= 2) {
                 currentPair = deck.splice(0, 2);
             } else if (deck.length === 1) {
-                // Odd man out: take the last move, pair it with any random move
-                currentPair = [deck.pop(), getRandomMove()];
+                const finalMove = deck.pop();
+                currentPair = [finalMove, getRandomPartner(finalMove)];
             } else {
-                // Deck empty – cycle finished, reshuffle and start fresh
-                remainingInfo.textContent = "Cycle complete! Reshuffling…";
-                // Reshuffle without losing the message for a moment
+                remainingInfo.textContent = "Cycle complete! Reshuffling...";
+
                 setTimeout(() => {
                     fullReset();
                 }, 800);
+
                 return;
             }
+
             renderPair();
             updateRemainingInfo();
         }
 
         function renderPair() {
-            if (currentPair.length >= 1) {
-                card1El.textContent = currentPair[0];
-                card1El.style.display = 'flex';
-            } else {
-                card1El.textContent = '';
-                card1El.style.display = 'none';
-            }
+            const cards = [
+                [card1El, currentPair[0]],
+                [card2El, currentPair[1]]
+            ];
 
-            if (currentPair.length >= 2) {
-                card2El.textContent = currentPair[1];
-                card2El.style.display = 'flex';
-            } else {
-                card2El.textContent = '';
-                card2El.style.display = 'none';
-            }
+            cards.forEach(([element, move]) => {
+                if (move) {
+                    element.textContent = move;
+                    element.style.display = "flex";
+                } else {
+                    element.textContent = "";
+                    element.style.display = "none";
+                }
+            });
         }
 
-        // Called when "Done" is clicked – discards the current pair and moves on
         function discardAndNext() {
-            // Simply drop currentPair, draw the next one
             showNextPair();
         }
 
         function updateRemainingInfo() {
-            // Show how many moves are still in the deck (not counting the current pair)
-            remainingInfo.textContent = `${deck.length} move(s) left in the deck`;
+            remainingInfo.textContent = `${deck.length} figure(s) left in this cycle | ${allMoves.length} total`;
         }
 
-        // Event listeners
-        doneBtn.addEventListener('click', discardAndNext);
-        restartBtn.addEventListener('click', fullReset);
+        doneBtn.addEventListener("click", discardAndNext);
+        restartBtn.addEventListener("click", fullReset);
 
-        // Start on load
         fullReset();
     </script>
 </body>

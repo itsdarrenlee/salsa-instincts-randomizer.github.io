@@ -1,0 +1,101 @@
+---
+layout: null
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ site.title }} | Panda + Honey Badger challenge</title>
+    <link rel="stylesheet" href="{{ '/assets/site.css' | relative_url }}">
+</head>
+<body>
+    <main class="page-shell">
+        <nav class="site-nav" aria-label="Site">
+            <a href="{{ '/' | relative_url }}">Randomizer</a>
+            <a href="{{ '/challenge.html' | relative_url }}" aria-current="page">Challenge</a>
+            <a href="{{ '/figures.html' | relative_url }}">Figure reference</a>
+        </nav>
+
+        <header class="hero">
+            <p class="eyebrow">Panda + Honey Badger</p>
+            <h1>Instrument Loop Challenge</h1>
+            <p class="hero-copy">Mix your cards from Panda and Honey Badger, draw a random 5-8 figure set, and loop those figures while dancing them to different instruments.</p>
+        </header>
+
+        <section class="panel">
+            <p class="challenge-note" id="challengeInstruction">
+                Draw a challenge, then keep cycling through the selected figures while switching the instrument focus in your dancing.
+            </p>
+
+            <div class="challenge-grid" id="challengeGrid" aria-live="polite"></div>
+
+            <div class="challenge-actions">
+                <button class="done-btn" id="shuffleChallengeBtn">Draw new 5-8 card challenge</button>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const figureGroups = {{ site.data.figures | jsonify }};
+        const challengePool = figureGroups
+            .flatMap((group) => group.figures)
+            .filter((figure) => figure.level === "panda" || figure.level === "honey-badger");
+
+        if (challengePool.length === 0) {
+            throw new Error("No Panda or Honey Badger figures found in _data/figures.yml");
+        }
+
+        const challengeGridEl = document.getElementById("challengeGrid");
+        const shuffleChallengeBtn = document.getElementById("shuffleChallengeBtn");
+
+        function shuffleArray(items) {
+            const shuffled = [...items];
+
+            for (let index = shuffled.length - 1; index > 0; index -= 1) {
+                const swapIndex = Math.floor(Math.random() * (index + 1));
+                [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+            }
+
+            return shuffled;
+        }
+
+        function getChallengeSize(total) {
+            const min = Math.min(5, total);
+            const max = Math.min(8, total);
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function formatLevel(level) {
+            return level === "honey-badger" ? "Honey Badger" : "Panda";
+        }
+
+        function renderChallenge() {
+            const shuffledPool = shuffleArray(challengePool);
+            const challengeSize = getChallengeSize(shuffledPool.length);
+            const selectedFigures = shuffledPool.slice(0, challengeSize);
+
+            if (selectedFigures.length === 0) {
+                challengeGridEl.innerHTML = '<p class="empty-state">No challenge figures available.</p>';
+                return;
+            }
+
+            challengeGridEl.innerHTML = selectedFigures.map((figure) => `
+                <article class="challenge-card">
+                    <div>
+                        <h2>${figure.name}</h2>
+                    </div>
+                    <div class="challenge-meta">
+                        <span class="pill ${figure.level === "panda" ? "pill--panda" : "pill--honey-badger"}">${formatLevel(figure.level)}</span>
+                        <span class="pill">${figure.timestamp}</span>
+                    </div>
+                </article>
+            `).join("");
+        }
+
+        shuffleChallengeBtn.addEventListener("click", renderChallenge);
+
+        renderChallenge();
+    </script>
+</body>
+</html>

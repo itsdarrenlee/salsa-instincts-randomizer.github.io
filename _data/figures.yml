@@ -1,0 +1,110 @@
+- title: Current set 1
+  source: existing
+  figures:
+    - name: Susie Q
+      timestamp: "1:56"
+      level: panda
+    - name: Zeta
+      timestamp: "3:46"
+      level: panda
+    - name: Rhombus
+      timestamp: "6:09"
+      level: panda
+    - name: Kick Ball Change
+      timestamp: "8:00"
+      level: panda
+    - name: Crosses Forward
+      timestamp: "10:06"
+      level: panda
+    - name: Cross Over
+      timestamp: "12:13"
+      level: panda
+
+- title: Current set 2
+  source: existing
+  figures:
+    - name: Mambo
+      timestamp: "1:29"
+      level: panda
+    - name: Cross-Step-Suzi Q
+      timestamp: "2:42"
+      level: panda
+    - name: Braid
+      timestamp: "4:26"
+      level: panda
+    - name: Fence
+      timestamp: "7:07"
+      level: panda
+    - name: Grapevine
+      timestamp: "8:25"
+      level: panda
+
+- title: Current set 3
+  source: existing
+  figures:
+    - name: Right Turn
+      timestamp: "1:21"
+      level: panda
+    - name: Left Turn
+      timestamp: "6:18"
+      level: panda
+    - name: 1/2 Right Spin
+      timestamp: "10:49"
+      level: panda
+    - name: 1/2 Left Spin
+      timestamp: "13:03"
+      level: panda
+
+- title: New set 1
+  source: new
+  figures:
+    - name: Son Step
+      timestamp: "1:08"
+      level: honey-badger
+    - name: Diagonal Step
+      timestamp: "3:05"
+      level: honey-badger
+    - name: Back Braid on 7
+      timestamp: "4:20"
+      level: honey-badger
+    - name: Rails
+      timestamp: "6:18"
+      level: honey-badger
+    - name: Tacon-Punta
+      timestamp: "9:10"
+      level: honey-badger
+
+- title: New set 2
+  source: new
+  figures:
+    - name: Round Basic
+      timestamp: "1:20"
+      level: honey-badger
+    - name: Hop Step
+      timestamp: "3:41"
+      level: honey-badger
+    - name: Con Saoco
+      timestamp: "6:30"
+      level: honey-badger
+    - name: Shoes
+      timestamp: "9:26"
+      level: honey-badger
+    - name: Heel Twist
+      timestamp: "12:14"
+      level: honey-badger
+
+- title: New set 3
+  source: new
+  figures:
+    - name: Full Right Spin
+      timestamp: "1:12"
+      level: honey-badger
+    - name: Full Left Spin
+      timestamp: "2:32"
+      level: honey-badger
+    - name: Hook Turn
+      timestamp: "3:12"
+      level: honey-badger
+    - name: Left False Turn
+      timestamp: "4:51"
+      level: honey-badger

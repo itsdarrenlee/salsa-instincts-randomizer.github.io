@@ -1,0 +1,52 @@
+---
+layout: null
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ site.title }} | Figure reference</title>
+    <link rel="stylesheet" href="{{ '/assets/site.css' | relative_url }}">
+</head>
+<body>
+    {% assign total_figures = 0 %}
+    {% for group in site.data.figures %}
+        {% assign total_figures = total_figures | plus: group.figures.size %}
+    {% endfor %}
+
+    <main class="page-shell">
+        <nav class="site-nav" aria-label="Site">
+            <a href="{{ '/' | relative_url }}">Randomizer</a>
+            <a href="{{ '/challenge.html' | relative_url }}">Challenge</a>
+            <a href="{{ '/figures.html' | relative_url }}" aria-current="page">Figure reference</a>
+        </nav>
+
+        <header class="hero">
+            <p class="eyebrow">Salsa Instincts</p>
+            <h1>Figure Reference</h1>
+            <p class="hero-copy">{{ total_figures }} figures across the current catalog, with timestamps grouped the same way they are organized in the shared data file.</p>
+        </header>
+
+        <div class="group-grid">
+            {% for group in site.data.figures %}
+                <section class="panel">
+                    <div class="panel-heading">
+                        <h2>{{ group.title }}</h2>
+                        <span class="pill">{{ group.source }}</span>
+                    </div>
+
+                    <ul class="figure-list">
+                        {% for figure in group.figures %}
+                            <li>
+                                <span class="figure-name">{{ figure.name }}</span>
+                                <span class="figure-time">{{ figure.timestamp }} · {{ figure.level }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </section>
+            {% endfor %}
+        </div>
+    </main>
+</body>
+</html>
